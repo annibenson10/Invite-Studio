@@ -1,0 +1,29 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "../vendor/shadcn-tailwind-4.13.0.css";
+
+:root {
+  --background: #f4f3ef; --foreground: #171512; --card: #ffffff; --card-foreground: #171512;
+  --popover: #ffffff; --popover-foreground: #171512; --primary: #f58220; --primary-foreground: #ffffff;
+  --secondary: #f0eee9; --secondary-foreground: #171512; --muted: #f0eee9; --muted-foreground: #6d6860;
+  --accent: #fff3e8; --accent-foreground: #a84c08; --destructive: #d92d20; --border: #e5e1da;
+  --input: #ded9d1; --ring: #f58220; --radius: .75rem;
+}
+
+@theme inline {
+  --color-background: var(--background); --color-foreground: var(--foreground); --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground); --color-popover: var(--popover); --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary); --color-primary-foreground: var(--primary-foreground); --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground); --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground); --color-destructive: var(--destructive);
+  --color-border: var(--border); --color-input: var(--input); --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px); --radius-md: calc(var(--radius) - 2px); --radius-lg: var(--radius); --radius-xl: calc(var(--radius) + 6px);
+  --font-sans: Arial, Helvetica, sans-serif; --font-display: Arial, Helvetica, sans-serif;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--background); color: var(--foreground); font-family: Arial, Helvetica, sans-serif; }
+.font-display { font-family: Arial, Helvetica, sans-serif; }
+.invite-card { background-image: radial-gradient(circle at 86% 14%, rgba(245,130,32,.22), transparent 28%), linear-gradient(145deg,#191612,#30291f 64%,#9e4a12); }
+button, input { font: inherit; }
+@media (max-width: 640px) { .invite-card { max-height: 590px; } }
