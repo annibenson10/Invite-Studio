@@ -37,9 +37,9 @@ function PinForm({ onSignedIn }: { onSignedIn: (eventName: string) => void }) {
   }
 
   return (
-    <main className="grid min-h-screen place-items-center bg-[#171512] p-4 text-white">
-      <form onSubmit={submit} className="w-full max-w-sm rounded-[26px] bg-white p-7 text-center text-[#171512]">
-        <div className="mx-auto grid size-14 place-items-center rounded-2xl bg-[#f58220] text-white">
+    <main className="grid min-h-dvh place-items-center bg-night p-4 text-white">
+      <form onSubmit={submit} className="w-full max-w-sm rounded-[26px] bg-white p-7 text-center text-ink">
+        <div className="mx-auto grid size-14 place-items-center rounded-2xl bg-brand text-white">
           <UserCheck size={26} />
         </div>
         <h1 className="mt-5 text-2xl font-bold">Door check-in</h1>
@@ -51,10 +51,10 @@ function PinForm({ onSignedIn }: { onSignedIn: (eventName: string) => void }) {
           autoComplete="one-time-code"
           aria-label="Event PIN"
           placeholder="••••••"
-          className="mt-6 w-full rounded-xl border border-black/15 px-4 py-4 text-center font-mono text-3xl tracking-[.4em] outline-none focus:border-[#f58220]"
+          className="mt-6 w-full rounded-xl border border-black/15 px-4 py-4 text-center font-mono text-3xl tracking-[.4em] outline-none focus:border-brand"
         />
-        {error && <p className="mt-3 text-sm font-semibold text-[#a6372f]">{error}</p>}
-        <button disabled={busy || pin.length !== 6} className="mt-5 w-full rounded-xl bg-[#f58220] py-4 font-bold text-white disabled:opacity-50">
+        {error && <p className="mt-3 text-sm font-semibold text-danger">{error}</p>}
+        <button disabled={busy || pin.length !== 6} className="mt-5 w-full rounded-xl bg-brand py-4 font-bold text-white disabled:opacity-50">
           {busy ? "Checking…" : "Start scanning"}
         </button>
       </form>
@@ -204,7 +204,7 @@ function Scanner({ eventName, eventParam, onSignedOut }: { eventName: string; ev
   }
 
   return (
-    <main className="min-h-screen bg-[#171512] text-white">
+    <main className="min-h-dvh bg-night text-white">
       <header className="flex items-center justify-between gap-3 px-4 py-4">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[.15em] text-white/45">Door check-in</p>
@@ -236,10 +236,10 @@ function Scanner({ eventName, eventParam, onSignedOut }: { eventName: string; ev
         <div className="relative overflow-hidden rounded-[22px] bg-black">
           <video ref={videoRef} playsInline muted className={`aspect-square w-full object-cover ${cameraOn ? "" : "hidden"}`} />
           {cameraOn ? (
-            <div className="pointer-events-none absolute inset-[18%] rounded-2xl border-4 border-[#f58220]/80" />
+            <div className="pointer-events-none absolute inset-[18%] rounded-2xl border-4 border-brand/80" />
           ) : (
             <button onClick={() => setCameraOn(true)} className="flex aspect-square w-full flex-col items-center justify-center gap-3 text-white/80">
-              <span className="grid size-16 place-items-center rounded-full bg-[#f58220] text-white">
+              <span className="grid size-16 place-items-center rounded-full bg-brand text-white">
                 <Camera size={28} />
               </span>
               <span className="font-semibold">Tap to start the camera</span>
@@ -252,12 +252,12 @@ function Scanner({ eventName, eventParam, onSignedOut }: { eventName: string; ev
             </button>
           )}
         </div>
-        {cameraError && <p className="rounded-xl bg-[#a6372f]/25 px-4 py-3 text-sm text-red-100">{cameraError}</p>}
+        {cameraError && <p className="rounded-xl bg-danger/25 px-4 py-3 text-sm text-red-100">{cameraError}</p>}
 
         {last && <ResultCard result={last} onUndo={undoCheckIn} />}
-        {error && <p className="rounded-xl bg-[#a6372f]/25 px-4 py-3 text-sm text-red-100">{error}</p>}
+        {error && <p className="rounded-xl bg-danger/25 px-4 py-3 text-sm text-red-100">{error}</p>}
 
-        <div className="rounded-[22px] bg-white p-4 text-[#171512]">
+        <div className="rounded-[22px] bg-white p-4 text-ink">
           <p className="font-semibold">Can’t scan? Search by name or ticket code</p>
           <div className="relative mt-3">
             <Search size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-black/35" />
@@ -266,7 +266,7 @@ function Scanner({ eventName, eventParam, onSignedOut }: { eventName: string; ev
               onChange={(event) => setQuery(event.target.value)}
               placeholder="e.g. Ada or K7Q-2MX"
               aria-label="Search guests"
-              className="h-12 w-full rounded-xl border border-black/12 bg-[#f7f6f2] pl-10 pr-3 outline-none focus:border-[#f58220]"
+              className="h-12 w-full rounded-xl border border-black/12 bg-surface-2 pl-10 pr-3 outline-none focus:border-brand"
             />
           </div>
           {matches.length > 0 && (
@@ -280,11 +280,11 @@ function Scanner({ eventName, eventParam, onSignedOut }: { eventName: string; ev
                     </p>
                   </div>
                   {guest.checkedInAt ? (
-                    <button onClick={() => undoCheckIn(guest)} className="shrink-0 rounded-lg bg-[#eaf8ef] px-3 py-2 text-xs font-bold text-[#167a3f]">
+                    <button onClick={() => undoCheckIn(guest)} className="shrink-0 rounded-lg bg-success-soft px-3 py-2 text-xs font-bold text-success">
                       ✓ {formatTime(guest.checkedInAt)}
                     </button>
                   ) : (
-                    <button onClick={() => checkInGuest(guest)} className="shrink-0 rounded-lg bg-[#171512] px-4 py-2 text-sm font-bold text-white">
+                    <button onClick={() => checkInGuest(guest)} className="shrink-0 rounded-lg bg-night px-4 py-2 text-sm font-bold text-white">
                       Check in
                     </button>
                   )}
@@ -302,7 +302,7 @@ function Scanner({ eventName, eventParam, onSignedOut }: { eventName: string; ev
 function ResultCard({ result, onUndo }: { result: ScanResult; onUndo: (guest: ScanGuest) => void }) {
   if (result.result === "not_found") {
     return (
-      <div role="status" className="rounded-[22px] bg-[#a6372f] p-5">
+      <div role="status" className="rounded-[22px] bg-danger p-5">
         <p className="text-xl font-bold">✕ Not on the guest list</p>
         <p className="mt-1 text-sm text-white/80">This QR code doesn’t belong to this event. Try searching by name.</p>
       </div>
@@ -311,7 +311,7 @@ function ResultCard({ result, onUndo }: { result: ScanResult; onUndo: (guest: Sc
   const { guest } = result;
   const fresh = result.result === "checked_in";
   return (
-    <div role="status" className={`rounded-[22px] p-5 ${fresh ? "bg-[#278237]" : "bg-[#c77a12]"}`}>
+    <div role="status" className={`rounded-[22px] p-5 ${fresh ? "bg-success" : "bg-[#c77a12]"}`}>
       <p className="text-sm font-bold uppercase tracking-[.12em] text-white/80">{fresh ? "✓ Welcome" : "⚠ Already checked in"}</p>
       <p className="mt-1 text-2xl font-bold">{guest.name}</p>
       <p className="mt-1 text-sm text-white/85">

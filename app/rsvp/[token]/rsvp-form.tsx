@@ -1,60 +1,64 @@
 "use client";
 
 import { useState } from "react";
+import { Check, Loader2, X } from "lucide-react";
 import { api } from "@/lib/client";
 
 type Answer = "yes" | "no";
 
+/**
+ * One tap on Yes or No records the answer. (Link previews in chat apps load
+ * the page but never tap buttons, so they can't answer on a guest's behalf.)
+ */
 export function RsvpForm({
   token,
   guestName,
   eventName,
   initialResponse,
-  preselect,
+  hint,
 }: {
   token: string;
   guestName: string;
   eventName: string;
   initialResponse: Answer | null;
-  preselect: Answer | null;
+  hint: Answer | null;
 }) {
   const [response, setResponse] = useState<Answer | null>(initialResponse);
-  const [choice, setChoice] = useState<Answer | null>(initialResponse ? null : preselect);
   const [justSubmitted, setJustSubmitted] = useState(false);
-  const [busy, setBusy] = useState(false);
+  const [pending, setPending] = useState<Answer | null>(null);
   const [error, setError] = useState("");
+  const firstName = guestName.split(/\s+/)[0];
 
-  async function submit(answer: Answer) {
-    setBusy(true);
+  async function answer(choice: Answer) {
+    if (pending) return;
+    setPending(choice);
     setError("");
     try {
-      const result = await api<{ response: Answer }>(`/api/rsvp/${token}`, { method: "POST", json: { response: answer } });
+      const result = await api<{ response: Answer }>(`/api/rsvp/${token}`, { method: "POST", json: { response: choice } });
       setResponse(result.response);
       setJustSubmitted(true);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Something went wrong. Please try again.");
     } finally {
-      setBusy(false);
+      setPending(null);
     }
   }
 
   if (response) {
+    const yes = response === "yes";
     return (
-      <div>
-        <div className={`mx-auto grid size-20 place-items-center rounded-full text-3xl text-white ${response === "yes" ? "bg-[#278237]" : "bg-[#a6372f]"}`}>
-          {response === "yes" ? "✓" : "✕"}
+      <div className="text-center" role="status">
+        <div className={`mx-auto grid size-16 place-items-center rounded-full ${yes ? "bg-success-soft text-success" : "bg-danger-soft text-danger"}`}>
+          {yes ? <Check size={30} strokeWidth={2.5} /> : <X size={30} strokeWidth={2.5} />}
         </div>
-        <h1 className="mt-6 text-2xl font-bold tracking-tight">{justSubmitted ? "Thank you, your response is saved" : "You have already responded"}</h1>
-        <p className="mt-3 text-lg">
-          <strong>{guestName}</strong>, {eventName}
+        <h1 className="mt-5 text-2xl font-bold tracking-tight">
+          {justSubmitted ? (yes ? `See you there, ${firstName}!` : `Thanks for letting us know, ${firstName}`) : "You’ve already responded"}
+        </h1>
+        <p className="mt-2 text-ink-2">
+          {eventName} · <span className={`font-semibold ${yes ? "text-success" : "text-danger"}`}>{yes ? "Attending" : "Not attending"}</span>
         </p>
-        <p className={`mt-5 text-xl font-bold ${response === "yes" ? "text-[#278237]" : "text-[#a6372f]"}`}>
-          {response === "yes" ? "Attending" : "Not attending"}
-        </p>
-        <p className="mx-auto mt-6 max-w-sm text-sm leading-6 text-slate-500">
-          {response === "yes"
-            ? "Please bring your invitation with its QR code to the venue."
-            : "Change of plans? Contact the organiser and they can update your response."}
+        <p className="mx-auto mt-5 max-w-xs text-sm leading-6 text-ink-3">
+          {yes ? "Bring your invitation with its QR code. It’s your entry pass at the door." : "Change of plans? Contact the organiser and they can update your response."}
         </p>
       </div>
     );
@@ -62,37 +66,29 @@ export function RsvpForm({
 
   return (
     <div>
-      <h1 className="text-3xl font-bold tracking-tight">Will you be attending?</h1>
-      <p className="mt-4 text-lg">
-        Hello <strong>{guestName}</strong>,
+      <p className="text-xs font-bold uppercase tracking-[.18em] text-brand">You’re invited</p>
+      <h1 className="mt-2 text-[26px] font-bold leading-tight tracking-tight">{eventName}</h1>
+      <p className="mt-3 text-ink-2">
+        Hi <span className="font-semibold text-ink">{guestName}</span>, will you be attending?
       </p>
-      <p className="mx-auto mt-1 max-w-md leading-7 text-slate-500">please let us know if you will attend {eventName}. You can respond once.</p>
-      <div className="mx-auto mt-8 grid max-w-md gap-3 sm:grid-cols-2">
+      <div className="mt-6 grid gap-3">
         <button
-          onClick={() => setChoice("yes")}
-          aria-pressed={choice === "yes"}
-          className={`rounded-xl border-2 px-5 py-4 font-bold transition ${choice === "yes" ? "border-[#278237] bg-[#278237] text-white" : "border-[#278237] bg-white text-[#278237] hover:bg-green-50"}`}
+          onClick={() => answer("yes")}
+          disabled={Boolean(pending)}
+          className={`flex h-14 items-center justify-center gap-2 rounded-2xl bg-success text-base font-bold text-white shadow-sm transition active:scale-[.98] disabled:opacity-70 ${hint === "yes" ? "ring-4 ring-success/25" : ""}`}
         >
-          Yes, I will attend
+          {pending === "yes" ? <Loader2 className="animate-spin" size={18} /> : <Check size={18} strokeWidth={2.5} />} Yes, I’ll be there
         </button>
         <button
-          onClick={() => setChoice("no")}
-          aria-pressed={choice === "no"}
-          className={`rounded-xl border-2 px-5 py-4 font-bold transition ${choice === "no" ? "border-[#a6372f] bg-[#a6372f] text-white" : "border-[#a6372f] bg-white text-[#a6372f] hover:bg-red-50"}`}
+          onClick={() => answer("no")}
+          disabled={Boolean(pending)}
+          className={`flex h-14 items-center justify-center gap-2 rounded-2xl border-2 border-line bg-surface text-base font-bold text-ink transition hover:border-danger/40 active:scale-[.98] disabled:opacity-70 ${hint === "no" ? "border-danger/50 ring-4 ring-danger/10" : ""}`}
         >
-          No, I can’t attend
+          {pending === "no" ? <Loader2 className="animate-spin" size={18} /> : <X size={18} strokeWidth={2.5} />} No, I can’t make it
         </button>
       </div>
-      {choice && (
-        <button
-          disabled={busy}
-          onClick={() => submit(choice)}
-          className="mx-auto mt-5 block w-full max-w-md rounded-xl bg-[#171512] px-5 py-4 font-bold text-white hover:bg-black disabled:opacity-60"
-        >
-          {busy ? "Saving…" : `Confirm: ${choice === "yes" ? "I will attend" : "I can’t attend"}`}
-        </button>
-      )}
-      {error && <p className="mt-4 text-sm font-semibold text-[#a6372f]">{error}</p>}
+      <p className="mt-4 text-center text-xs text-ink-3">Your answer is saved as soon as you tap. You can respond once.</p>
+      {error && <p role="alert" className="mt-3 rounded-xl bg-danger-soft px-3 py-2 text-center text-sm font-semibold text-danger">{error}</p>}
     </div>
   );
 }
